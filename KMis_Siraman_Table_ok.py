@@ -2,12 +2,24 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import make_interp_spline
+from tkinter import Tk, filedialog
 
-# Data sampel referensi (pastikan path-nya benar)
-reference_data = pd.read_excel(r'HDPE (1).xlsx')
+# Fungsi untuk mengunggah file Excel
+def upload_excel_file():
+    root = Tk()
+    root.withdraw()  # Sembunyikan jendela utama
 
-# Data sampel baru (pastikan path-nya benar)
-new_data = pd.read_excel(r'BKT (1).xlsx')
+    file_path = filedialog.askopenfilename(filetypes=[("Excel Files", "*.xlsx")])
+
+    return file_path
+
+# Unggah file referensi dan sampel baru
+reference_file_path = upload_excel_file()
+new_file_path = upload_excel_file()
+
+# Membaca data dari file Excel
+reference_data = pd.read_excel(reference_file_path)
+new_data = pd.read_excel(new_file_path)
 
 # Konversi kolom 'X' dan 'Y' ke tipe data numerik dengan penanganan kesalahan
 reference_data['X'] = pd.to_numeric(reference_data['X'], errors='coerce')
@@ -29,9 +41,8 @@ y_new = new_data['Y']
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
 
 # Plot sampel referensi pada subplot pertama
-
 # Membuat kurva interpolasi untuk sampel referensi
-x_interp_reference = np.linspace(x_reference.min(), x_reference.max(), 500)  # Membuat titik-titik baru untuk sumbu X
+x_interp_reference = np.linspace(x_reference.min(), x_reference.max(), 1000)  # Membuat titik-titik baru untuk sumbu X
 spl_reference = make_interp_spline(x_reference, y_reference, k=3)  # Membuat spline interpolasi kubik
 y_interp_reference = spl_reference(x_interp_reference)  # Menghasilkan data kurva yang mulus
 
@@ -58,7 +69,7 @@ if 0 <= percentage_similarity_x <= 100 and 0 <= percentage_similarity_y <= 100:
         keterangan_similarity = 'Mirip'
     elif 31 <= percentage_similarity_x <= 50 and 31 <= percentage_similarity_y <= 50:
         keterangan_similarity = 'Hampir Mirip'
-    elif difference_x_y < 20:
+    elif difference_x_y < 25:
         keterangan_similarity = 'Sedikit Berbeda'
     else:
         keterangan_similarity = 'Cukup Berbeda'
@@ -69,9 +80,8 @@ ax1.legend()
 ax1.grid(False)
 
 # Plot sampel yang dimiliki pada subplot kedua
-
 # Membuat kurva interpolasi untuk sampel baru
-x_interp_new = np.linspace(x_new.min(), x_new.max(), 500)  # Membuat titik-titik baru untuk sumbu X
+x_interp_new = np.linspace(x_new.min(), x_new.max(), 1000)  # Membuat titik-titik baru untuk sumbu X
 spl_new = make_interp_spline(x_new, y_new, k=3)  # Membuat spline interpolasi kubik
 y_interp_new = spl_new(x_interp_new)  # Menghasilkan data kurva yang mulus
 
